@@ -15,6 +15,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const items = [
   {
@@ -32,6 +33,14 @@ const items = [
 ];
 
 const Header = () => {
+  const navigate = useNavigate();
+  const showLoginPage = () => {
+    navigate("/login");
+  };
+
+  const showRegisterPage = () => {
+    navigate("/register");
+  };
   return (
     <Container>
       <WrapperHeader>
@@ -64,6 +73,7 @@ const Header = () => {
         />
         <AccountGroup>
           <Button
+            onClick={showRegisterPage}
             size="large"
             style={{
               borderRadius: "28px",
@@ -75,6 +85,7 @@ const Header = () => {
             Đăng ký
           </Button>
           <Button
+            onClick={showLoginPage}
             size="large"
             style={{
               marginLeft: "-38px",
