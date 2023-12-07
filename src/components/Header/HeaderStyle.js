@@ -4,6 +4,9 @@ import { Input, Space } from "antd";
 
 export const Container = styled.div`
   background-color: #0066ff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 `;
 
 export const WrapperHeader = styled.div`
@@ -21,7 +24,8 @@ export const Logo = styled(Link)`
   color: #fff;
   text-decoration: none;
   font-size: 32px;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 0;
+  user-select: none;
   &:hover {
     opacity: 0.9;
   }
@@ -33,6 +37,7 @@ export const TextLogo = styled.h1`
 
 export const SpaceCatagory = styled(Space)`
   padding: 8px 16px 8px 0;
+  user-select: none;
   &:hover {
     opacity: 0.9;
     cursor: pointer;
@@ -40,7 +45,6 @@ export const SpaceCatagory = styled(Space)`
 `;
 
 export const AccountGroup = styled.div`
-  transform: translateX(38px);
   font-weight: bold;
   .ant-btn {
     font-weight: 700;

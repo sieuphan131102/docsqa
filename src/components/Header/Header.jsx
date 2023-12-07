@@ -14,7 +14,7 @@ import {
   CaretDownOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Space } from "antd";
+import { Button, Dropdown } from "antd";
 
 const items = [
   {
@@ -24,6 +24,10 @@ const items = [
   {
     key: "2",
     label: "Item 2",
+  },
+  {
+    key: "3",
+    label: "Item 3",
   },
 ];
 
@@ -44,7 +48,6 @@ const Header = () => {
             style={{
               display: "flex",
               gap: "2px",
-              alignItems: "center",
               fontSize: "18px",
               fontWeight: "500",
               color: "#fff",
@@ -65,7 +68,7 @@ const Header = () => {
             style={{
               borderRadius: "28px",
               zIndex: "1",
-              width: "112px",
+              width: "120px",
               borderColor: "#0066ff",
             }}
           >
@@ -74,8 +77,8 @@ const Header = () => {
           <Button
             size="large"
             style={{
-              transform: "translateX(-38px)",
-              paddingLeft: "48px",
+              marginLeft: "-38px",
+              paddingLeft: "42px",
               borderRadius: "28px",
               borderColor: "#0066ff",
             }}
