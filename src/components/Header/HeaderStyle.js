@@ -63,3 +63,14 @@ export const SearchInput = styled(Input.Search)`
     height: 32px;
   }
 `;
+
+export const WrapperUser = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-size: 18px;
+  &:hover {
+    cursor: pointer;
+  }
+`;

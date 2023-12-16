@@ -7,7 +7,7 @@ export const WrapperFooter = styled.div`
 
 export const FooterBody = styled.footer`
   max-width: 1200px;
-  height: 78px;
+  height: 52px;
   margin-left: auto;
   margin-right: auto;
   color: #fff;

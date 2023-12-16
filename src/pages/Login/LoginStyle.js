@@ -1,6 +1,17 @@
 import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
 export const WrapperLogin = styled.div`
   background-color: rgba(0, 0, 0, 0.3);
   position: fixed;
@@ -9,6 +20,7 @@ export const WrapperLogin = styled.div`
   width: 100%;
   height: 100%;
   z-index: 100;
+  animation: ${fadeIn} 0.3s ease-in-out;
 `;
 
 export const LoginModal = styled.div`
