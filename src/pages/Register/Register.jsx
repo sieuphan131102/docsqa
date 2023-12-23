@@ -27,6 +27,7 @@ const Register = () => {
   });
 
   const { userName, password, confirmPassword } = inputValue;
+  const [isLoading, setLoading] = useState(false);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +44,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/user/register`,
         {
@@ -61,6 +63,8 @@ const Register = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
     setInputValue({
       ...inputValue,
@@ -122,6 +126,7 @@ const Register = () => {
                 size="large"
                 type="primary"
                 onClick={handleSubmit}
+                loading={isLoading}
               >
                 Đăng ký
               </Button>

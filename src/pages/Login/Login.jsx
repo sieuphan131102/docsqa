@@ -14,8 +14,12 @@ import { Button, Flex, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import * as message from "../../components/Message/Message";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { updateUser } from "../../redux/slices/userSlice";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const closeModal = () => {
     navigate("/");
@@ -27,6 +31,7 @@ const Login = () => {
   });
 
   const { userName, password } = inputValue;
+  const [isLoading, setLoading] = useState(false);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +48,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/user/login`,
         {
@@ -50,10 +56,14 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      const { status, message, access_token } = data;
+      const { status, message, access_token, refresh_token } = data;
 
       if (access_token) {
         localStorage.setItem("access_token", access_token);
+      }
+
+      if (refresh_token) {
+        localStorage.setItem("refresh_token", refresh_token);
       }
 
       if (status !== "ERROR") {
@@ -64,13 +74,40 @@ const Login = () => {
       } else {
         handleError(message);
       }
+      const decode = jwtDecode(access_token);
+      if (decode?.id) {
+        handleGetDetailsUser(decode?.id, access_token);
+      }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
     setInputValue({
       ...inputValue,
       password: "",
     });
+  };
+
+  const handleGetDetailsUser = async (id, token) => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/user/get/${id}`,
+        {
+          headers: {
+            token: `Bearer ${token}`,
+          },
+        }
+      );
+      dispatch(
+        updateUser({
+          ...res?.data.data,
+          access_token: token,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -118,6 +155,7 @@ const Login = () => {
                 size="large"
                 type="primary"
                 onClick={handleSubmit}
+                loading={isLoading}
               >
                 Đăng nhập
               </Button>

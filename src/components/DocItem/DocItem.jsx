@@ -3,9 +3,10 @@ import { Card } from "antd";
 import { CardDocItem } from "./DocItemStyle";
 const { Meta } = Card;
 
-const DocItem = ({ img, title, description, alt }) => {
+const DocItem = ({ img, title, author, alt, onClick }) => {
   return (
     <CardDocItem
+      onClick={onClick}
       hoverable
       style={{
         padding: "12px",
@@ -13,7 +14,8 @@ const DocItem = ({ img, title, description, alt }) => {
       }}
       cover={<img alt={alt} src={img} />}
     >
-      <Meta title={title} description={description} />
+      <Meta title={title} />
+      <p>{author}</p>
     </CardDocItem>
   );
 };

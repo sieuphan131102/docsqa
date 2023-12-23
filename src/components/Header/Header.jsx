@@ -12,11 +12,21 @@ import {
 import { FilePdfOutlined, SearchOutlined } from "@ant-design/icons";
 import { Avatar, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { resetUser } from "../../redux/slices/userSlice";
+import { setSearchText } from "../../redux/slices/searchSlice";
+import * as msg from "../Message/Message";
 
 const Header = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
+  const [username, setUsername] = useState(user?.userName);
+
+  useEffect(() => {
+    setUsername(user?.userName);
+  }, [user?.userName]);
+
   const showLoginPage = () => {
     navigate("/login");
   };
@@ -25,35 +35,25 @@ const Header = () => {
     navigate("/register");
   };
 
-  const [username, setUsername] = useState("");
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("access_token");
-    if (accessToken) {
-      const decode = jwtDecode(accessToken);
-      if (decode?.id) {
-        getUserById(decode?.id, accessToken);
-      }
-    }
-  });
-
-  const getUserById = async (id, token) => {
-    const { data } = await axios.get(
-      `${process.env.REACT_APP_API_URL}/user/get/${id}`,
-      {
-        headers: {
-          token: `Bearer ${token}`,
-        },
-      }
-    );
-    let userName = data.data.userName;
-    setUsername(userName);
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     setUsername("");
+    dispatch(resetUser(user));
     navigate("/login");
+  };
+
+  const handleGoProfile = () => {
+    navigate(`/profile/${user?.id}`);
+  };
+
+  const handleSearch = (value) => {
+    if (value) {
+      localStorage.setItem("search", value);
+      dispatch(setSearchText(value));
+      navigate("/search-result");
+    } else {
+      msg.warning("Nhập từ khóa!");
+    }
   };
 
   return (
@@ -63,21 +63,27 @@ const Header = () => {
           <FilePdfOutlined />
           <TextLogo>DocSQA</TextLogo>
         </Logo>
-        <Button
+        {/* <Button
           size="large"
           style={{ fontSize: "16px", borderRadius: "28px", fontWeight: "500" }}
         >
           Tải lên
-        </Button>
+        </Button> */}
         <SearchInput
+          onSearch={handleSearch}
           bordered={false}
           placeholder="Nhập từ khóa..."
           enterButton={<SearchOutlined />}
         />
         {username ? (
           <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-            <WrapperUser>
-              <Avatar size={40}>{username.slice(0, 1)}</Avatar>
+            <WrapperUser onClick={handleGoProfile}>
+              <Avatar
+                size={40}
+                src={`${process.env.REACT_APP_API_URL}/avatar/${
+                  user?.avatar || "avatar.jpg"
+                }`}
+              />
               {username}
             </WrapperUser>
             <Button size="small" onClick={handleLogout}>

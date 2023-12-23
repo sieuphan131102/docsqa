@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const TextAreaWithWarning = () => {
+const TextAreaWithWarning = ({ onReviewChange }) => {
   const [isFocused, setFocused] = useState(false);
   const [text, setText] = useState("");
   const [showWarning, setShowWarning] = useState(false);
@@ -13,6 +13,7 @@ const TextAreaWithWarning = () => {
     const newText = e.target.value;
     setText(newText);
     setShowWarning(false);
+    onReviewChange(newText);
   };
 
   const handleBlur = () => {

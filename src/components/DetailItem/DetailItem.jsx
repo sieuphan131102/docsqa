@@ -1,47 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   GroupHeader,
   GroupText,
   ShareIcon,
   WrapperDocsGroup,
 } from "./DetailItemStyle";
-import { Button, Image, Modal, Rate } from "antd";
+import { Button, Image, List, Modal, Rate, Spin } from "antd";
 import { IoCloudDownloadOutline } from "react-icons/io5";
 import { FaFacebook } from "react-icons/fa";
 
-import img1 from "../../assets/images/img1.jpeg";
 import ReadMore from "./ReadMore";
 import UserRate from "../UserRate/UserRate";
 import TextAreaWithValidation from "./TextAreaWithWarning";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import moment from "moment";
+import * as msg from "../../components/Message/Message";
 
-const text = `Hai cuộc cách mạng công nghiệp đầu tiên đã mang đến những tiến
-bộ vượt bậc và vĩ đại trong lịch sử nhân loại bằng việc sử dụng
-động cơ hơi nước, động cơ đốt trong và sự phát triển của các
-ngành công nghiệp dầu mỏ, hoá chất, thép và điện lực. Nhưng thực
-tế, nhân loại và mọi nền kinh tế đang quá phụ thuộc vào nguồn
-năng lượng có hạn và đang suy tàn ở mức báo dộng của Trái Đất.
-Từ việc khai thác vô tội vạ những nguồn tài nguyên của môi
-trường, đến việc sản xuất hàng hoá hay những hành dộng đơn giản
-như ăn uống và hấp thụ để góp phần tạo ra sự phát thải CO2 và
-những loại khí cùng chất thải gây ô nhiễm - với số lượng ngày
-một gia tăng gây nên hiện trạng quá tải cho việc tái tạo của bầu
-sinh quyển. Cuốn Cuộc cách mạng công nghiệp lần thứ III này sẽ
-cung cấp cho chúng ta những phân tích về thực trạng hiện nay của
-môi trường cũng như sự tồn vong của trái đất.Thông quá đó,
-chúng ta sẽ biết được vai trò tất yếu của việc phát dộng một
-cuộc cách mạng mới. Một cuộc cách mạng trong đó, mọi người đều
-có thể tự tạo ra những nhà máy phát điện mini tại nhà hoặc tại
-cơ quan bằng việc sử dụng những nguồn năng lượng tái tạo - từ
-nguồn năng lượng thiên nhiên vô hạn như nước, gió, và mặt
-trời...Tận dụng công nghệ hydro và Internet để lưu trữ, chia sẻ
-và phân phát năng lượng một cách rộng rãi dồng thời thay đổi các
-loại phương tiện hiện tại thành phương tiện sử dụng pin nhiên
-liệu có thể mua và bán điện thông qua một lưới điện thông minh.
-Tất cả sẽ tạo nên một cuộc cách mạng công nghiệp lần thứ III -
-một hành trình nỗ lực để cải cách năng lượng xanh.`;
-
-const DetailItem = () => {
+const DetailItem = ({ data }) => {
+  const user = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+
+  const [userRating, setUserRating] = useState(0);
+  const [userComment, setUserComment] = useState("");
+
+  useEffect(() => {
+    setLoading(true);
+    getAllReview();
+  }, []);
+
+  const getAllReview = async () => {
+    try {
+      await axios
+        .get(
+          `${process.env.REACT_APP_API_URL}/review/get/${localStorage.getItem(
+            "docId"
+          )}`
+        )
+        .then((res) => {
+          setReviews(res?.data?.data);
+        });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -49,6 +57,75 @@ const DetailItem = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleRead = () => {
+    localStorage.setItem("doc", data.data);
+    navigate(`/view/${data._id}`);
+  };
+
+  const handleDownload = async () => {
+    const downloadLink = `${process.env.REACT_APP_API_URL}/${data.data}`;
+    const link = document.createElement("a");
+    link.href = downloadLink;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    handleUpdateCountDownload();
+  };
+
+  const handleRate = async () => {
+    try {
+      const userRate = {
+        rating: userRating,
+        comment: userComment,
+        user: user?.id,
+        document: localStorage.getItem("docId"),
+      };
+      await axios
+        .post(`${process.env.REACT_APP_API_URL}/review/post-review`, userRate)
+        .then((res) => {
+          if (res?.data?.status !== "ERROR") {
+            msg.success("Đánh giá thành công!");
+            setIsModalOpen(false);
+            getAllReview();
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleReviewChange = (newText) => {
+    setUserComment(newText);
+  };
+
+  const sortedComments = reviews.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  const calcRating = () => {
+    let sum = 0;
+    reviews.forEach((item) => {
+      sum += item.rating;
+    });
+    return sum / reviews.length;
+  };
+
+  const handleUpdateCountDownload = async () => {
+    const formData = new FormData();
+    formData.append("down", data?.down + 1);
+    try {
+      await axios.put(
+        `${
+          process.env.REACT_APP_API_URL
+        }/document/update/${localStorage.getItem("docId")}`,
+        formData
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -66,7 +143,9 @@ const DetailItem = () => {
               borderRadius: "12px",
               boxShadow: "0 0 5px rgba(0,0,0,0.3)",
             }}
-            src={img1}
+            src={`${process.env.REACT_APP_API_URL}/${
+              data?.image || "load.gif"
+            }`}
           />
           <div
             style={{
@@ -78,7 +157,7 @@ const DetailItem = () => {
           >
             <div>
               <h3 style={{ fontSize: "18px", lineHeight: "24px" }}>
-                6 Phát Minh Làm Nên Thời Đại
+                {data?.title}
               </h3>
               <h4
                 style={{
@@ -88,15 +167,15 @@ const DetailItem = () => {
                   paddingBottom: "12px",
                 }}
               >
-                Steven Johnson
+                {data?.author}
               </h4>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ height: "24px" }}>
-                    <Rate disabled value={4} />
+                    <Rate allowHalf disabled value={calcRating()} />
                   </div>
                   <h5 style={{ fontSize: "14px", color: "#0066FF" }}>
-                    1 đánh giá
+                    {reviews.length} đánh giá
                   </h5>
                 </div>
                 <div>
@@ -112,12 +191,12 @@ const DetailItem = () => {
                     <IoCloudDownloadOutline />
                   </div>
                   <h5 style={{ fontSize: "14px", color: "#0066FF" }}>
-                    13 lượt tải
+                    {data?.down} lượt tải
                   </h5>
                 </div>
               </div>
               <div style={{ paddingTop: "12px" }}>
-                <ReadMore text={text} maxLength={500} />
+                <ReadMore text={data?.description || ""} maxLength={500} />
               </div>
             </div>
             <div
@@ -128,8 +207,12 @@ const DetailItem = () => {
                 gap: "12px",
               }}
             >
-              <Button type="primary">Đọc sách</Button>
-              <Button type="primary">Tải sách</Button>
+              <Button onClick={handleRead} type="primary">
+                Đọc sách
+              </Button>
+              <Button onClick={handleDownload} type="primary">
+                Tải sách
+              </Button>
               <div
                 style={{
                   fontSize: "18px",
@@ -162,7 +245,7 @@ const DetailItem = () => {
             Đánh giá
           </Button>
         </GroupHeader>
-        <div style={{ padding: "12px 0" }}>
+        <Spin spinning={isLoading} style={{ padding: "12px 0" }}>
           <div
             style={{
               display: "flex",
@@ -170,18 +253,28 @@ const DetailItem = () => {
               paddingBottom: "12px",
             }}
           >
-            <Rate disabled value={4} />
-            <h5 style={{ marginLeft: "12px", color: "#0066ff" }}>1 đánh giá</h5>
+            <Rate allowHalf disabled value={calcRating()} />
+            <h5 style={{ marginLeft: "12px", color: "#0066ff" }}>
+              {reviews.length} đánh giá
+            </h5>
           </div>
-          <div>
-            <UserRate />
-            <UserRate />
-            <UserRate />
-          </div>
-          <div style={{ textAlign: "center", display: "block" }}>
-            <Button type="primary">Xem thêm</Button>
-          </div>
-        </div>
+          <List
+            dataSource={sortedComments}
+            pagination={{ pageSize: 3 }}
+            renderItem={(doc, index) => (
+              <UserRate
+                key={index}
+                rating={doc.rating}
+                comment={doc.comment}
+                datePost={moment(doc.createdAt).format("DD/MM/yyy HH:mm:ss")}
+                avatar={`${process.env.REACT_APP_API_URL}/avatar/${
+                  doc?.user?.avatar || "avatar.jpg"
+                }`}
+                nameOfUser={doc?.user?.fullName}
+              />
+            )}
+          />
+        </Spin>
       </WrapperDocsGroup>
       <Modal open={isModalOpen} footer={null} onCancel={closeModal}>
         <h1
@@ -203,10 +296,13 @@ const DetailItem = () => {
           }}
         >
           <Rate
+            value={userRating}
+            onChange={setUserRating}
             style={{ padding: "12px", textAlign: "center", fontSize: "32px" }}
           />
-          <TextAreaWithValidation />
+          <TextAreaWithValidation onReviewChange={handleReviewChange} />
           <Button
+            onClick={handleRate}
             style={{ marginTop: "12px", width: "fit-content" }}
             type="primary"
           >
