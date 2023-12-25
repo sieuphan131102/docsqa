@@ -63,12 +63,6 @@ const Header = () => {
           <FilePdfOutlined />
           <TextLogo>DocSQA</TextLogo>
         </Logo>
-        {/* <Button
-          size="large"
-          style={{ fontSize: "16px", borderRadius: "28px", fontWeight: "500" }}
-        >
-          Tải lên
-        </Button> */}
         <SearchInput
           onSearch={handleSearch}
           bordered={false}

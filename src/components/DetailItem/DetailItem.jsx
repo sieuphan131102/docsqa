@@ -270,7 +270,7 @@ const DetailItem = ({ data }) => {
                 avatar={`${process.env.REACT_APP_API_URL}/avatar/${
                   doc?.user?.avatar || "avatar.jpg"
                 }`}
-                nameOfUser={doc?.user?.fullName}
+                nameOfUser={doc?.user?.fullName || doc?.user?.userName}
               />
             )}
           />

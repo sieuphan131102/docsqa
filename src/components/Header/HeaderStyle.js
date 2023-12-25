@@ -6,7 +6,7 @@ export const Container = styled.div`
   background-color: #0066ff;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 10;
 `;
 
 export const WrapperHeader = styled.div`

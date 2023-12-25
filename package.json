@@ -1,5 +1,6 @@
 {
   "name": "docsqa",
+  "author":"Phan Thanh Sieu",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
