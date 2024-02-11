@@ -5,6 +5,7 @@ import Type from "../../components/Type/Type";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { Spin } from "antd";
+import { Helmet } from "react-helmet";
 
 const DocType = () => {
   const searchType = useSelector((state) => state.search);
@@ -36,6 +37,9 @@ const DocType = () => {
 
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
+      <Helmet>
+        <title>DocSQA | Thể loại {localStorage.getItem("type")}</title>
+      </Helmet>
       <Container>
         <NavbarLeft />
         <Spin spinning={isLoading}>

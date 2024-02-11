@@ -7,6 +7,7 @@ import axios from "axios";
 import { updateUser } from "../../redux/slices/userSlice";
 import * as msg from "../../components/Message/Message";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -81,6 +82,9 @@ const UserProfile = () => {
 
   return (
     <div style={{ background: "#eeefff" }}>
+      <Helmet>
+        <title>Thông tin người dùng</title>
+      </Helmet>
       <Container>
         <h3 style={{ fontSize: "24px", paddingTop: "48px" }}>
           Thông tin người dùng

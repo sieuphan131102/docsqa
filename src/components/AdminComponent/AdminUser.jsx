@@ -1,14 +1,12 @@
 import { Avatar, Button, Input, Modal, Popconfirm, Space, Table } from "antd";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import avatarDefault from "../../assets/images/avatar-cute.jpg";
-import moment from "moment";
+import { Helmet } from "react-helmet";
+import * as message from "../../components/Message/Message";
 
 const AdminUser = () => {
-  const user = useSelector((state) => state.user);
   const searchInput = useRef(null);
 
   const [users, setUsers] = useState([]);
@@ -16,13 +14,26 @@ const AdminUser = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [record, setRecord] = useState({});
   const [tableKey, setTableKey] = useState(0);
+  const [isAddUserModalOpen, setAddUserModalOpen] = useState(false);
+
+  const [fullName, setFullName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [userId, setUserId] = useState("");
+  const [fullNameUD, setFullNameUD] = useState("");
+  const [userNameUD, setUserNameUD] = useState("");
+  const [emailUD, setEmailUD] = useState("");
+  const [addressUD, setAddressUD] = useState("");
+  const [avatar, setAvatar] = useState("");
 
   useEffect(() => {
     setLoading(true);
     getAllUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -191,7 +202,7 @@ const AdminUser = () => {
           >
             <Button>Xóa</Button>
           </Popconfirm>
-          <Button onClick={() => handleShowMore(record)}>Xem thông tin</Button>
+          <Button onClick={() => handle(record)}>Cập nhật</Button>
         </span>
       ),
     },
@@ -215,8 +226,13 @@ const AdminUser = () => {
     setIsModalOpen(false);
   };
 
-  const handleShowMore = (this_record) => {
-    setRecord(this_record);
+  const handle = (this_record) => {
+    setUserId(this_record._id);
+    setFullNameUD(this_record.fullName);
+    setUserNameUD(this_record.userName);
+    setAddressUD(this_record.address);
+    setEmailUD(this_record.email);
+    setAvatar(this_record.avatar);
     setIsModalOpen(true);
   };
 
@@ -228,23 +244,125 @@ const AdminUser = () => {
     getAllUser();
   };
 
+  const handleError = (err) => message.error(err);
+
+  const handleSuccess = (msg) => message.success(msg);
+
+  const resetInput = () => {
+    const form = document.getElementById("formAddUser");
+    form.reset();
+    setFullName("");
+    setUserName("");
+    setAddress("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_API_URL}/user/register`,
+        {
+          fullName,
+          userName,
+          password,
+          confirmPassword,
+          email,
+          address,
+        }
+      );
+      const { status } = data;
+      if (status !== "ERROR") {
+        handleSuccess("Thêm người dùng thành công");
+        resetInput();
+        handleResetTable();
+      } else {
+        handleError("Thêm người dùng thất bại!!!");
+        console.log(data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOnChange = async (e) => {
+    const img = e.target.files[0];
+    try {
+      if (img) {
+        const formData = new FormData();
+        formData.append("avatar", img);
+        await axios
+          .put(
+            `${process.env.REACT_APP_API_URL}/user/update/${userId}`,
+            formData
+          )
+          .then((res) => {
+            if (res?.data?.status !== "ERROR") {
+              handleSuccess("Cập avatar thành công!");
+              setAvatar(res?.data?.data?.avatar);
+              handleResetTable();
+            } else {
+              handleError("Lỗi cập nhật avatar người dùng");
+            }
+          });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateInfoUser = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("fullName", fullNameUD);
+    formData.append("userName", userNameUD);
+    formData.append("address", addressUD);
+    formData.append("email", emailUD);
+    try {
+      await axios
+        .put(`${process.env.REACT_APP_API_URL}/user/update/${userId}`, formData)
+        .then((res) => {
+          if (res?.data?.status !== "ERROR") {
+            handleSuccess("Cập nhật thành công!");
+            closeModal();
+            handleResetTable();
+          } else {
+            handleError("Cập nhật thất bại!!!");
+          }
+        });
+    } catch (error) {
+      console.log("Error: " + error);
+    }
+  };
+
   return (
     <div>
-      <Button
-        onClick={handleResetTable}
-        style={{ marginBottom: "12px" }}
-        type="primary"
-      >
-        Làm mới
-      </Button>
+      <Helmet>
+        <title>Admin Page | Quản lý người dùng</title>
+      </Helmet>
+      <div style={{ display: "flex", gap: "12px", marginBottom: "12px" }}>
+        <Button onClick={() => setAddUserModalOpen(true)} type="primary">
+          Thêm người dùng
+        </Button>
+        <Button onClick={handleResetTable} type="primary">
+          Làm mới
+        </Button>
+      </div>
       <Table
         key={tableKey}
         loading={isLoading}
         columns={columns}
         dataSource={data}
       />
+
+      {/* Modal show and update user */}
       <Modal open={isModalOpen} onCancel={closeModal} footer={null}>
-        <div
+        <form
           style={{
             display: "flex",
             flexDirection: "column",
@@ -266,7 +384,14 @@ const AdminUser = () => {
               <Avatar
                 shape="square"
                 size={240}
-                src={record?.avatar || avatarDefault}
+                src={`${process.env.REACT_APP_API_URL}/avatar/${
+                  avatar || "avatar.jpg"
+                }`}
+              />
+              <input
+                onChange={handleOnChange}
+                type="file"
+                accept=".jpeg, .png, .jpg"
               />
               <h3>Ảnh đại diện</h3>
             </div>
@@ -281,33 +406,123 @@ const AdminUser = () => {
             >
               <div>
                 <h3>ID: </h3>
-                {record?.key}
+                {userId}
               </div>
               <div>
                 <h3>Họ và tên: </h3>
-                {record?.fullName}
+                <input
+                  type="text"
+                  onChange={(e) => setFullNameUD(e.target.value)}
+                  value={fullNameUD}
+                />
               </div>
               <div>
                 <h3>Tài khoản: </h3>
-                {record?.userName}
+                <input
+                  type="text"
+                  onChange={(e) => setUserNameUD(e.target.value)}
+                  value={userNameUD}
+                />
               </div>
               <div>
                 <h3>Email : </h3>
-                {record?.email}
+                <input
+                  type="text"
+                  onChange={(e) => setEmailUD(e.target.value)}
+                  value={emailUD}
+                />
               </div>
               <div>
                 <h3>Địa chỉ: </h3>
-                {record?.address}
+                <input
+                  type="text"
+                  onChange={(e) => setAddressUD(e.target.value)}
+                  value={addressUD}
+                />
               </div>
               <div>
-                <h3>
-                  Ngày tạo:{" "}
-                  {moment(record?.createdAt).format("DD/MM/yyyy HH:mm:ss")}
-                </h3>
+                <Button
+                  htmlType="submit"
+                  onClick={handleUpdateInfoUser}
+                  type="primary"
+                >
+                  Cập nhật
+                </Button>
               </div>
             </div>
           </div>
-        </div>
+        </form>
+      </Modal>
+
+      {/* Modal add user */}
+      <Modal
+        open={isAddUserModalOpen}
+        onCancel={() => setAddUserModalOpen(false)}
+        footer={null}
+      >
+        <h3 style={{ fontSize: "24px", padding: "12px 0" }}>
+          Thêm một người dùng mới
+        </h3>
+        <form id="formAddUser">
+          <div>
+            <div>
+              <h3>Tên người dùng</h3>
+              <input
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                type="text"
+              />
+            </div>
+            <div>
+              <h3>Tên tài khoản</h3>
+              <input
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                type="text"
+              />
+            </div>
+            <div>
+              <h3>Mật khẩu</h3>
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+              />
+            </div>
+            <div>
+              <h3>Nhập lại mật khẩu</h3>
+              <input
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                type="password"
+              />
+            </div>
+            <div>
+              <h3>Email</h3>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+              />
+            </div>
+            <div>
+              <h3>Địa chỉ</h3>
+              <input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                type="text"
+              />
+            </div>
+            <Button
+              style={{ marginTop: "12px" }}
+              onClick={handleAddUser}
+              type="primary"
+              htmlType="submit"
+            >
+              Thêm người dùng
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

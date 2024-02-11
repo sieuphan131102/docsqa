@@ -5,6 +5,7 @@ import SearchRessult from "../../components/SearchRessult/SearchRessult";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { Spin } from "antd";
+import { Helmet } from "react-helmet";
 
 const Search = () => {
   const searchText = useSelector((state) => state.search);
@@ -39,6 +40,9 @@ const Search = () => {
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
       <Container>
+        <Helmet>
+          <title>Kết quả tìm kiếm "{localStorage.getItem("search")}"</title>
+        </Helmet>
         <NavbarLeft />
         <Spin spinning={isLoading}>
           <SearchRessult data={result} />

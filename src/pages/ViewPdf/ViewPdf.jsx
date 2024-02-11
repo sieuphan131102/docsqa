@@ -8,6 +8,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { Button, FloatButton, Input } from "antd";
 import * as msg from "../../components/Message/Message";
 import { ZoomInOutlined, ZoomOutOutlined } from "@ant-design/icons";
+import { Helmet } from "react-helmet";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -23,8 +24,16 @@ const ViewPdf = () => {
     const handleKeyPress = (event) => {
       if (event.key === "ArrowLeft" && pageNumber > 1) {
         setPageNumber((prevPageNumber) => prevPageNumber - 1);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
       } else if (event.key === "ArrowRight" && pageNumber < numPages) {
         setPageNumber((prevPageNumber) => prevPageNumber + 1);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
       }
     };
     document.addEventListener("keydown", handleKeyPress);
@@ -40,12 +49,20 @@ const ViewPdf = () => {
   const handlePrevious = () => {
     if (pageNumber > 1) {
       setPageNumber(pageNumber - 1);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
   };
 
   const handleNext = () => {
     if (pageNumber < numPages) {
       setPageNumber(pageNumber + 1);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -60,6 +77,10 @@ const ViewPdf = () => {
       return;
     } else {
       setPageNumber(num);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -84,6 +105,9 @@ const ViewPdf = () => {
 
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
+      <Helmet>
+        <title>{`Xem tài liệu `}</title>
+      </Helmet>
       <Container>
         <NavbarLeft />
         <div

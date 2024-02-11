@@ -8,6 +8,7 @@ import {
 import { Button, Image, List, Modal, Rate, Spin } from "antd";
 import { IoCloudDownloadOutline } from "react-icons/io5";
 import { FaFacebook } from "react-icons/fa";
+import { EyeTwoTone } from "@ant-design/icons";
 
 import ReadMore from "./ReadMore";
 import UserRate from "../UserRate/UserRate";
@@ -62,20 +63,29 @@ const DetailItem = ({ data }) => {
   const handleRead = () => {
     localStorage.setItem("doc", data.data);
     navigate(`/view/${data._id}`);
+    handleUpdateCountView();
   };
 
   const handleDownload = async () => {
-    const downloadLink = `${process.env.REACT_APP_API_URL}/${data.data}`;
-    const link = document.createElement("a");
-    link.href = downloadLink;
-    link.target = "_blank";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    handleUpdateCountDownload();
+    if (data?.price === 0) {
+      const downloadLink = `${process.env.REACT_APP_API_URL}/${data.data}`;
+      const link = document.createElement("a");
+      link.href = downloadLink;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      handleUpdateCountDownload();
+    } else {
+      alert("Bạn nghèo vc");
+    }
   };
 
   const handleRate = async () => {
+    if (!user?.id) {
+      msg.warning("Vui lòng đăng nhập để đánh giá!");
+      return;
+    }
     try {
       const userRate = {
         rating: userRating,
@@ -116,6 +126,21 @@ const DetailItem = ({ data }) => {
   const handleUpdateCountDownload = async () => {
     const formData = new FormData();
     formData.append("down", data?.down + 1);
+    try {
+      await axios.put(
+        `${
+          process.env.REACT_APP_API_URL
+        }/document/update/${localStorage.getItem("docId")}`,
+        formData
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateCountView = async () => {
+    const formData = new FormData();
+    formData.append("view", data?.view + 1);
     try {
       await axios.put(
         `${
@@ -211,7 +236,7 @@ const DetailItem = ({ data }) => {
                 Đọc sách
               </Button>
               <Button onClick={handleDownload} type="primary">
-                Tải sách
+                Tải sách ({data?.price === 0 ? "FREE" : data?.price} VNĐ)
               </Button>
               <div
                 style={{
@@ -232,6 +257,17 @@ const DetailItem = ({ data }) => {
                 >
                   <FaFacebook />
                 </ShareIcon>
+              </div>
+              <div
+                style={{
+                  fontSize: "18px",
+                  display: "flex",
+                  gap: "8px",
+                  alignItems: "center",
+                }}
+              >
+                Lượt xem: {data?.view}
+                <EyeTwoTone />
               </div>
             </div>
           </div>
@@ -276,6 +312,8 @@ const DetailItem = ({ data }) => {
           />
         </Spin>
       </WrapperDocsGroup>
+
+      {/* Modal rating */}
       <Modal open={isModalOpen} footer={null} onCancel={closeModal}>
         <h1
           style={{

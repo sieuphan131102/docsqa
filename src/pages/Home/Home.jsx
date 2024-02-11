@@ -5,6 +5,7 @@ import { Container } from "./HomeStyle";
 import DocsGroup from "../../components/DocsGroup/DocsGroup";
 import axios from "axios";
 import { Spin } from "antd";
+import { Helmet } from "react-helmet";
 
 const Home = () => {
   const [docs, setDocs] = useState([]);
@@ -30,6 +31,9 @@ const Home = () => {
 
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
+      <Helmet>
+        <title>DocSQA | Trang chủ</title>
+      </Helmet>
       <Container>
         <NavbarLeft />
         <Spin spinning={isLoading}>

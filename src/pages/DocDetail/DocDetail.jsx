@@ -5,6 +5,7 @@ import DetailItem from "../../components/DetailItem/DetailItem";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { Spin } from "antd";
+import { Helmet } from "react-helmet";
 
 const DocDetail = () => {
   const searchId = useSelector((state) => state.search);
@@ -36,6 +37,9 @@ const DocDetail = () => {
 
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
+      <Helmet>
+        <title>{`DocSQA | ${doc.title} - ${doc.author}`}</title>
+      </Helmet>
       <Container>
         <NavbarLeft />
         <Spin spinning={isLoading}>

@@ -13,6 +13,7 @@ import { Button, Flex, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import * as message from "../../components/Message/Message";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -52,14 +53,14 @@ const Register = () => {
         },
         { withCredentials: true }
       );
-      const { status, message } = data;
+      const { status } = data;
       if (status !== "ERROR") {
-        handleSuccess(message);
+        handleSuccess("Đăng ký thành công");
         setTimeout(() => {
           navigate("/login");
         }, 1000);
       } else {
-        handleError(message);
+        handleError("Đăng ký thất bại!!!");
       }
     } catch (error) {
       console.log(error);
@@ -78,6 +79,9 @@ const Register = () => {
       <Home />
       <WrapperRegister>
         <RegisterModal>
+          <Helmet>
+            <title>Đăng ký tài khoản DocSQA</title>
+          </Helmet>
           <div>
             <WrapperClose onClick={closeModal}>
               <CloseOutlined />
@@ -126,6 +130,7 @@ const Register = () => {
                 size="large"
                 type="primary"
                 onClick={handleSubmit}
+                htmlType="submit"
                 loading={isLoading}
               >
                 Đăng ký

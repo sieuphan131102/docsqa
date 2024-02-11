@@ -1,6 +1,6 @@
 {
   "name": "docsqa",
-  "author":"Phan Thanh Sieu",
+  "author": "Phan Thanh Sieu",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,6 +16,7 @@
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
     "react-highlight-words": "^0.20.0",
     "react-icons": "^4.12.0",
     "react-pdf": "^7.6.0",

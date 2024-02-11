@@ -17,6 +17,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../../redux/slices/userSlice";
 import { jwtDecode } from "jwt-decode";
+import { Helmet } from "react-helmet";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -56,7 +57,7 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      const { status, message, access_token, refresh_token } = data;
+      const { status, access_token, refresh_token } = data;
 
       if (access_token) {
         localStorage.setItem("access_token", access_token);
@@ -67,12 +68,12 @@ const Login = () => {
       }
 
       if (status !== "ERROR") {
-        handleSuccess(message);
+        handleSuccess("Đăng nhập thành công");
         setTimeout(() => {
           navigate("/");
         }, 1000);
       } else {
-        handleError(message);
+        handleError("Tài khoản hoặc mật khẩu không đúng!");
       }
       const decode = jwtDecode(access_token);
       if (decode?.id) {
@@ -115,6 +116,9 @@ const Login = () => {
       <Home />
       <WrapperLogin>
         <LoginModal>
+          <Helmet>
+            <title>Đăng nhập vào DocSQA</title>
+          </Helmet>
           <div>
             <WrapperClose onClick={closeModal}>
               <CloseOutlined />
@@ -155,6 +159,7 @@ const Login = () => {
                 size="large"
                 type="primary"
                 onClick={handleSubmit}
+                htmlType="submit"
                 loading={isLoading}
               >
                 Đăng nhập

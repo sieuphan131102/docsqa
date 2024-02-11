@@ -5,6 +5,7 @@ import Highlighter from "react-highlight-words";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import * as msg from "../../components/Message/Message";
+import { Helmet } from "react-helmet";
 
 const AdminDoc = () => {
   const user = useSelector((state) => state.user);
@@ -253,7 +254,8 @@ const AdminDoc = () => {
     setSearchText("");
   };
 
-  const handlePost = async () => {
+  const handlePost = async (e) => {
+    e.preventDefault();
     try {
       const formData = new FormData();
       formData.append("title", nameDoc);
@@ -298,7 +300,8 @@ const AdminDoc = () => {
     setDescriptionDoc("");
   };
 
-  const handleUpdateDoc = async () => {
+  const handleUpdateDoc = async (e) => {
+    e.preventDefault();
     const formData = new FormData();
     formData.append("title", nameDocUD);
     formData.append("author", authorDocUD);
@@ -318,7 +321,7 @@ const AdminDoc = () => {
             setIsModalOpen(false);
             handleResetTable();
           } else {
-            msg.error(res?.data?.message);
+            msg.error("Cập nhật thất bại!!!");
           }
         });
     } catch (error) {
@@ -326,10 +329,28 @@ const AdminDoc = () => {
     }
   };
 
-  const data = docs.map((item) => ({ ...item, key: item._id }));
+  const calcRating = (reviews) => {
+    let sum = 0;
+    if (reviews.length !== 0) {
+      reviews.forEach((item) => {
+        sum += item.rating;
+      });
+      return sum / reviews.length;
+    }
+    return 0;
+  };
+
+  const data = docs.map((item) => ({
+    ...item,
+    key: item._id,
+    rating: calcRating(item.reviews) + "🤩",
+  }));
 
   return (
     <div>
+      <Helmet>
+        <title>Admin Page | Quản lý tài liệu</title>
+      </Helmet>
       <div style={{ display: "flex", gap: "12px", marginBottom: "12px" }}>
         <Button onClick={() => setAddDocModalOpen(true)} type="primary">
           Thêm tài liệu
@@ -345,6 +366,8 @@ const AdminDoc = () => {
         columns={columns}
         dataSource={data}
       />
+
+      {/* Modal add document */}
       <Modal
         open={isAddDocModalOpen}
         onCancel={() => setAddDocModalOpen(false)}
@@ -358,7 +381,6 @@ const AdminDoc = () => {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: "12px",
           }}
         >
           <div>
@@ -414,12 +436,19 @@ const AdminDoc = () => {
                 accept=".pdf"
               />
             </div>
+            <Button
+              style={{ marginTop: "12px" }}
+              htmlType="submit"
+              onClick={handlePost}
+              type="primary"
+            >
+              Thêm tài liệu
+            </Button>
           </div>
         </form>
-        <Button onClick={handlePost} type="primary">
-          Thêm tài liệu
-        </Button>
       </Modal>
+
+      {/* Modal update document info */}
       <Modal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -432,7 +461,6 @@ const AdminDoc = () => {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: "12px",
           }}
         >
           <div>
@@ -486,11 +514,16 @@ const AdminDoc = () => {
                 accept=".pdf"
               />
             </div>
+            <Button
+              style={{ marginTop: "12px" }}
+              onClick={handleUpdateDoc}
+              htmlType="submit"
+              type="primary"
+            >
+              Cập nhật tài liệu
+            </Button>
           </div>
         </form>
-        <Button onClick={handleUpdateDoc} type="primary">
-          Cập nhật tài liệu
-        </Button>
       </Modal>
     </div>
   );
