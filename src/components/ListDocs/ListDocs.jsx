@@ -11,7 +11,6 @@ const ListDocs = ({ data }) => {
   const dispatch = useDispatch();
 
   const handleDetailDoc = (id) => {
-    localStorage.setItem("docId", id);
     dispatch(setSearchDoc(id));
     navigate(`/detail/${id}`);
   };

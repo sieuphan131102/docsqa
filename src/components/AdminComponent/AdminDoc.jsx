@@ -193,6 +193,18 @@ const AdminDoc = () => {
       ...getColumnSearchProps("rating"),
     },
     {
+      title: "Lượt xem",
+      dataIndex: "view",
+      key: "view",
+      ...getColumnSearchProps("view"),
+    },
+    {
+      title: "Lượt tải",
+      dataIndex: "down",
+      key: "down",
+      ...getColumnSearchProps("down"),
+    },
+    {
       title: "Chức năng",
       key: "action",
       render: (record) => (

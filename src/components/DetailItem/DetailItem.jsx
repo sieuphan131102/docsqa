@@ -13,35 +13,48 @@ import { EyeTwoTone } from "@ant-design/icons";
 import ReadMore from "./ReadMore";
 import UserRate from "../UserRate/UserRate";
 import TextAreaWithValidation from "./TextAreaWithWarning";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import * as msg from "../../components/Message/Message";
 
 const DetailItem = ({ data }) => {
+  const { id } = useParams();
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const [payment, setPayment] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [success, setSuccess] = useState(false);
 
   const [userRating, setUserRating] = useState(0);
   const [userComment, setUserComment] = useState("");
 
   useEffect(() => {
     setLoading(true);
+    const getAllReview = async () => {
+      try {
+        await axios
+          .get(`${process.env.REACT_APP_API_URL}/review/get/${id}`)
+          .then((res) => {
+            setReviews(res?.data?.data);
+          });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
     getAllReview();
-  }, []);
+  }, [id]);
 
   const getAllReview = async () => {
     try {
       await axios
-        .get(
-          `${process.env.REACT_APP_API_URL}/review/get/${localStorage.getItem(
-            "docId"
-          )}`
-        )
+        .get(`${process.env.REACT_APP_API_URL}/review/get/${id}`)
         .then((res) => {
           setReviews(res?.data?.data);
         });
@@ -60,14 +73,49 @@ const DetailItem = ({ data }) => {
     setIsModalOpen(false);
   };
 
-  const handleRead = () => {
-    localStorage.setItem("doc", data.data);
-    navigate(`/view/${data._id}`);
-    handleUpdateCountView();
+  useEffect(() => {
+    const getHistory = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/user/history/get/${user.id}`
+        );
+        setHistory(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (user.id) {
+      getHistory();
+    }
+  }, [user, success]);
+
+  const isReaded = (docId) => {
+    for (let i = 0; i < history.length; i++) {
+      if (history[i].bookId._id === docId) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleRead = async () => {
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/user/history/${user.id}`,
+        {
+          bookId: id,
+        }
+      );
+      setSuccess(true);
+      navigate(`/view/${data._id}`);
+      handleUpdateCountView();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleDownload = async () => {
-    if (data?.price === 0) {
+    if (data?.price === 0 || isPaymented(data._id)) {
       const downloadLink = `${process.env.REACT_APP_API_URL}/${data.data}`;
       const link = document.createElement("a");
       link.href = downloadLink;
@@ -77,7 +125,7 @@ const DetailItem = ({ data }) => {
       document.body.removeChild(link);
       handleUpdateCountDownload();
     } else {
-      alert("Bạn nghèo vc");
+      navigate(`/buy/${data._id}`);
     }
   };
 
@@ -91,7 +139,7 @@ const DetailItem = ({ data }) => {
         rating: userRating,
         comment: userComment,
         user: user?.id,
-        document: localStorage.getItem("docId"),
+        document: id,
       };
       await axios
         .post(`${process.env.REACT_APP_API_URL}/review/post-review`, userRate)
@@ -128,9 +176,7 @@ const DetailItem = ({ data }) => {
     formData.append("down", data?.down + 1);
     try {
       await axios.put(
-        `${
-          process.env.REACT_APP_API_URL
-        }/document/update/${localStorage.getItem("docId")}`,
+        `${process.env.REACT_APP_API_URL}/document/update/${id}`,
         formData
       );
     } catch (error) {
@@ -143,14 +189,37 @@ const DetailItem = ({ data }) => {
     formData.append("view", data?.view + 1);
     try {
       await axios.put(
-        `${
-          process.env.REACT_APP_API_URL
-        }/document/update/${localStorage.getItem("docId")}`,
+        `${process.env.REACT_APP_API_URL}/document/update/${id}`,
         formData
       );
     } catch (error) {
       console.log(error);
     }
+  };
+
+  useEffect(() => {
+    const getPayments = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/user/payment/get/${user.id}`
+        );
+        setPayment(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (user.id) {
+      getPayments();
+    }
+  }, [user]);
+
+  const isPaymented = (docId) => {
+    for (let i = 0; i < payment.length; i++) {
+      if (payment[i].bookId._id === docId) {
+        return true;
+      }
+    }
+    return false;
   };
 
   return (
@@ -236,7 +305,8 @@ const DetailItem = ({ data }) => {
                 Đọc sách
               </Button>
               <Button onClick={handleDownload} type="primary">
-                Tải sách ({data?.price === 0 ? "FREE" : data?.price} VNĐ)
+                Tải sách (
+                {isPaymented(data._id) ? "Đã mua" : data?.price + " VNĐ"})
               </Button>
               <div
                 style={{
@@ -277,7 +347,7 @@ const DetailItem = ({ data }) => {
       <WrapperDocsGroup>
         <GroupHeader>
           <GroupText>{"Đánh giá sách"}</GroupText>
-          <Button onClick={showModal} type="primary">
+          <Button disabled={!isReaded(id)} onClick={showModal} type="primary">
             Đánh giá
           </Button>
         </GroupHeader>

@@ -8,6 +8,7 @@ import { updateUser } from "../../redux/slices/userSlice";
 import * as msg from "../../components/Message/Message";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { DollarTwoTone } from "@ant-design/icons";
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -134,14 +135,46 @@ const UserProfile = () => {
             </div>
             <div style={{ display: "flex", gap: "24px" }}>
               <Button onClick={handleUpdate}>Cập nhật</Button>
-              {user?.isAdmin ? (
+              {user?.isAdmin && (
                 <Button onClick={handleAdminPage} type="primary">
                   Quản trị viên
                 </Button>
-              ) : (
-                ""
               )}
             </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div style={{ marginRight: "8px" }}>
+                <span>Số xu: </span>
+                {user.coin} <DollarTwoTone />
+              </div>
+              <Button
+                onClick={() => {
+                  navigate(`/payment`);
+                }}
+                type="primary"
+              >
+                Nạp xu
+              </Button>
+            </div>
+            <Button
+              onClick={() => {
+                navigate("/history");
+              }}
+            >
+              Lịch sử đọc
+            </Button>
+            <Button
+              onClick={() => {
+                navigate("/history-payment");
+              }}
+            >
+              Lịch sử mua
+            </Button>
           </form>
         </div>
       </Container>

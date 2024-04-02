@@ -9,6 +9,9 @@ import { Button, FloatButton, Input } from "antd";
 import * as msg from "../../components/Message/Message";
 import { ZoomInOutlined, ZoomOutOutlined } from "@ant-design/icons";
 import { Helmet } from "react-helmet";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -16,9 +19,27 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 const ViewPdf = () => {
+  const { id } = useParams();
   const [numPages, setNumPages] = useState();
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1);
+  const [doc, setDoc] = useState(null);
+  const [payment, setPayment] = useState([]);
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const getDoc = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/document/get/${id}`
+        );
+        setDoc(res.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getDoc();
+  }, [id]);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -43,7 +64,11 @@ const ViewPdf = () => {
   }, [numPages, pageNumber]);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
+    if (doc?.price === 0 || isPaymented(id)) {
+      setNumPages(numPages);
+    } else {
+      setNumPages(10);
+    }
   };
 
   const handlePrevious = () => {
@@ -103,10 +128,35 @@ const ViewPdf = () => {
     setScale(scale - 0.1);
   };
 
+  useEffect(() => {
+    const getPayments = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/user/payment/get/${user.id}`
+        );
+        setPayment(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (user.id) {
+      getPayments();
+    }
+  }, [user]);
+
+  const isPaymented = (docId) => {
+    for (let i = 0; i < payment.length; i++) {
+      if (payment[i].bookId._id === docId) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
       <Helmet>
-        <title>{`Xem tài liệu `}</title>
+        <title>{`Xem tài liệu`}</title>
       </Helmet>
       <Container>
         <NavbarLeft />
@@ -125,9 +175,7 @@ const ViewPdf = () => {
         >
           <Document
             className={"bodyDoc"}
-            file={`${process.env.REACT_APP_API_URL}/${localStorage.getItem(
-              "doc"
-            )}`}
+            file={`${process.env.REACT_APP_API_URL}/${doc?.data}`}
             onLoadSuccess={onDocumentLoadSuccess}
           >
             <Page scale={scale} pageNumber={pageNumber} />

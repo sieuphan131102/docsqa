@@ -2,38 +2,33 @@ import React, { useEffect, useState } from "react";
 import { Container } from "./DocDetailStyle";
 import NavbarLeft from "../../components/NavbarLeft/NavbarLeft";
 import DetailItem from "../../components/DetailItem/DetailItem";
-import { useSelector } from "react-redux";
 import axios from "axios";
 import { Spin } from "antd";
 import { Helmet } from "react-helmet";
+import { useParams } from "react-router-dom";
 
 const DocDetail = () => {
-  const searchId = useSelector((state) => state.search);
+  const { id } = useParams();
   const [doc, setDoc] = useState({});
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    getOneDoc(searchId.text);
-  }, [searchId.text]);
-
-  const getOneDoc = async (id) => {
-    try {
-      await axios
-        .get(
-          `${process.env.REACT_APP_API_URL}/document/get/${
-            id || localStorage.getItem("docId")
-          }`
-        )
-        .then((res) => {
-          setDoc(res?.data?.data);
-        });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const getOneDoc = async () => {
+      try {
+        await axios
+          .get(`${process.env.REACT_APP_API_URL}/document/get/${id}`)
+          .then((res) => {
+            setDoc(res?.data?.data);
+          });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getOneDoc();
+  }, []);
 
   return (
     <div style={{ backgroundColor: "#eeefff" }}>

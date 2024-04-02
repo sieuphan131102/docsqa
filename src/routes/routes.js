@@ -7,6 +7,10 @@ import Search from "../pages/Search/Search";
 import UserProfile from "../pages/UserProfile/UserProfile";
 import Admin from "../pages/Admin/Admin";
 import ViewPdf from "../pages/ViewPdf/ViewPdf";
+import Payment from "../pages/Payment/Payment";
+import Buy from "../pages/Payment/Buy";
+import History from "../pages/History/History";
+import HistoryPayment from "../pages/History/HistoryPayment";
 
 export const routes = [
   {
@@ -54,5 +58,25 @@ export const routes = [
     key: "view-pdf",
     path: "/view/:id",
     page: ViewPdf,
+  },
+  {
+    key: "payment",
+    path: "/payment",
+    page: Payment,
+  },
+  {
+    key: "buy",
+    path: "/buy/:id",
+    page: Buy,
+  },
+  {
+    key: "histoty",
+    path: "/history",
+    page: History,
+  },
+  {
+    key: "history-payment",
+    path: "/history-payment",
+    page: HistoryPayment,
   },
 ];
