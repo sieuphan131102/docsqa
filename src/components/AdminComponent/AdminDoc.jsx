@@ -18,6 +18,7 @@ const AdminDoc = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [docs, setDocs] = useState([]);
   const [isAddDocModalOpen, setAddDocModalOpen] = useState(false);
+  const [type, setType] = useState([]);
 
   const [image, setImage] = useState();
   const [file, setFile] = useState();
@@ -33,6 +34,8 @@ const AdminDoc = () => {
   const [authorDocUD, setAuthorDocUD] = useState("");
   const [typeDocUD, setTypeDocUD] = useState("");
   const [descriptionDocUD, setDescriptionDocUD] = useState("");
+
+  console.log(typeDocUD);
 
   useEffect(() => {
     setLoading(true);
@@ -245,10 +248,11 @@ const AdminDoc = () => {
   };
 
   const handleOpenModalUpdate = (this_record) => {
+    console.log(this_record);
     setIdDoc(this_record._id);
     setNameDocUD(this_record.title);
     setAuthorDocUD(this_record.author);
-    setTypeDocUD(this_record.type);
+    setTypeDocUD(this_record.type._id);
     setDescriptionDocUD(this_record.description);
     setImageUD(this_record.image);
     setFileUD(this_record.data);
@@ -356,7 +360,22 @@ const AdminDoc = () => {
     ...item,
     key: item._id,
     rating: calcRating(item.reviews) + "🤩",
+    type: item.type.name,
   }));
+
+  useEffect(() => {
+    const getAllType = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/category/all`
+        );
+        setType(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllType();
+  }, []);
 
   return (
     <div>
@@ -414,11 +433,18 @@ const AdminDoc = () => {
             </div>
             <div>
               <h3>Thể loại</h3>
-              <input
+              <select
                 value={typeDoc}
                 onChange={(e) => setTypeDoc(e.target.value)}
-                type="text"
-              />
+                name="type"
+                id="type"
+              >
+                {type.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <h3>Mô tả</h3>
@@ -494,11 +520,18 @@ const AdminDoc = () => {
             </div>
             <div>
               <h3>Thể loại</h3>
-              <input
+              <select
                 value={typeDocUD}
                 onChange={(e) => setTypeDocUD(e.target.value)}
-                type="text"
-              />
+                name="type"
+                id="type"
+              >
+                {type.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <h3>Mô tả</h3>

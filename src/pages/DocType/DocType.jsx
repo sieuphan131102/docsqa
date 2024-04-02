@@ -22,7 +22,7 @@ const DocType = () => {
       await axios
         .get(
           `${process.env.REACT_APP_API_URL}/document/all?type=${
-            type || localStorage.getItem("type")
+            type || JSON.parse(localStorage.getItem("type"))._id
           }`
         )
         .then((res) => {
@@ -38,12 +38,17 @@ const DocType = () => {
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
       <Helmet>
-        <title>DocSQA | Thể loại {localStorage.getItem("type")}</title>
+        <title>
+          DocSQA | Thể loại {JSON.parse(localStorage.getItem("type")).name}
+        </title>
       </Helmet>
       <Container>
         <NavbarLeft />
         <Spin spinning={isLoading}>
-          <Type data={result} type={searchType.text} />
+          <Type
+            data={result}
+            type={JSON.parse(localStorage.getItem("type")).name}
+          />
         </Spin>
       </Container>
     </div>

@@ -88,6 +88,14 @@ const AdminStats = () => {
     return sum;
   };
 
+  const calcTotalRevenueCoin = () => {
+    let sum = 0;
+    users.forEach((user) => {
+      sum += user.coin;
+    });
+    return sum;
+  };
+
   const handleReset = () => {
     setLoading(true);
     getAllDocs();
@@ -150,19 +158,20 @@ const AdminStats = () => {
           <Card bordered={false} style={{ width: "240px", height: "120px" }}>
             <Statistic
               loading={isLoading}
-              title="Tổng số lượt tải"
-              value={calcTotalDown()}
+              title="Tổng doanh thu bán sách"
+              value={calcTotalRevenue()}
               valueStyle={{
                 color: "#000",
               }}
-              prefix={<CloudDownloadOutlined style={{ color: "#1677ff" }} />}
+              prefix={<DollarTwoTone />}
+              suffix="VNĐ"
             />
           </Card>
           <Card bordered={false} style={{ width: "240px", height: "120px" }}>
             <Statistic
               loading={isLoading}
-              title="Tổng doanh thu"
-              value={calcTotalRevenue()}
+              title="Tổng doanh thu nạp xu"
+              value={calcTotalRevenueCoin()}
               valueStyle={{
                 color: "#000",
               }}
@@ -179,6 +188,19 @@ const AdminStats = () => {
                 color: "#000",
               }}
               prefix={<UserOutlined style={{ color: "#1677ff" }} />}
+            />
+          </Card>
+        </div>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <Card bordered={false} style={{ width: "240px", height: "120px" }}>
+            <Statistic
+              loading={isLoading}
+              title="Tổng số lượt tải"
+              value={calcTotalDown()}
+              valueStyle={{
+                color: "#000",
+              }}
+              prefix={<CloudDownloadOutlined style={{ color: "#1677ff" }} />}
             />
           </Card>
         </div>

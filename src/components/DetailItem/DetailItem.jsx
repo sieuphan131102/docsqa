@@ -91,7 +91,7 @@ const DetailItem = ({ data }) => {
 
   const isReaded = (docId) => {
     for (let i = 0; i < history.length; i++) {
-      if (history[i].bookId._id === docId) {
+      if (history[i].bookId?._id === docId) {
         return true;
       }
     }

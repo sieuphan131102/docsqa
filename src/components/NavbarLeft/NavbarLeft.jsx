@@ -14,6 +14,7 @@ const NavbarLeft = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [docs, setDocs] = useState([]);
+  const [type, setType] = useState([]);
 
   useEffect(() => {
     getAllDocs();
@@ -34,21 +35,33 @@ const NavbarLeft = () => {
   };
 
   const handleGoTypePage = (type) => {
-    localStorage.setItem("type", type);
-    dispatch(setSearchType(type));
-    navigate(`/type/${type}`);
+    localStorage.setItem("type", JSON.stringify(type));
+    dispatch(setSearchType(type._id));
+    navigate(`/type`);
   };
 
-  const arrType = [...new Set(docs.map((item) => item.type))];
+  useEffect(() => {
+    const getAllType = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/category/all`
+        );
+        setType(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllType();
+  }, []);
 
   return (
     <WrapperNavbar>
       <TextNavbar>Thể loại</TextNavbar>
       <ListNavbar>
-        {arrType.map((type) => {
+        {type.map((type) => {
           return (
-            <ListItem onClick={() => handleGoTypePage(type)} key={type}>
-              {type}
+            <ListItem onClick={() => handleGoTypePage(type)} key={type._id}>
+              {type.name}
             </ListItem>
           );
         })}

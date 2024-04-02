@@ -1,11 +1,12 @@
 import { Menu } from "antd";
 import React, { useState } from "react";
-import { UserOutlined, BookOutlined } from "@ant-design/icons";
+import { UserOutlined, BookOutlined, TableOutlined } from "@ant-design/icons";
 import { TfiStatsUp } from "react-icons/tfi";
 import { Container } from "./AdminStyle";
 import AdminUser from "../../components/AdminComponent/AdminUser";
 import AdminDoc from "../../components/AdminComponent/AdminDoc";
 import AdminStatistic from "../../components/AdminComponent/AdminStatistic";
+import AdminType from "../../components/AdminComponent/AdminType";
 
 function getItem(label, key, icon, children, type) {
   return {
@@ -21,6 +22,7 @@ const items = [
   getItem("Thống kê", "statistic", <TfiStatsUp />),
   getItem("Quản lý người dùng", "user", <UserOutlined />),
   getItem("Quản lý tài liệu", "doc", <BookOutlined />),
+  getItem("Quản lý thể loại", "type", <TableOutlined />),
 ];
 
 const Admin = () => {
@@ -38,6 +40,8 @@ const Admin = () => {
         return <AdminDoc />;
       case "statistic":
         return <AdminStatistic />;
+      case "type":
+        return <AdminType />;
       default:
         return <AdminStatistic />;
     }

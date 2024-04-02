@@ -34,7 +34,8 @@ const History = () => {
   }, [user]);
 
   useEffect(() => {
-    const historyRender = history.map((item) => item.bookId);
+    const filterNull = history.filter((item) => item.bookId !== null);
+    const historyRender = filterNull.map((item) => item.bookId);
     setRender(historyRender);
   }, [history]);
 

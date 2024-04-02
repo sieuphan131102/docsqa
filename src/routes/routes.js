@@ -35,7 +35,7 @@ export const routes = [
   },
   {
     key: "doc-type-page",
-    path: "/type/:id",
+    path: "/type",
     page: DocType,
   },
   {
