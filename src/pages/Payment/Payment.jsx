@@ -9,15 +9,35 @@ const Payment = () => {
   const [selected, setSelected] = useState("bank");
 
   return (
-    <div style={{ backgroundColor: "#eeefff", minHeight: "100vh" }}>
+    <div
+      style={{
+        backgroundColor: "#eeefff",
+        minHeight: "100vh",
+        color: "#0066ff",
+      }}
+    >
       <Helmet>
         <title>DocSQA | Thanh toán</title>
       </Helmet>
       <Container>
-        <h1 style={{ textAlign: "center", fontSize: "24px", margin: "24px 0" }}>
+        <h1
+          style={{
+            textAlign: "center",
+            fontSize: "24px",
+            margin: "24px 0",
+          }}
+        >
           Thanh toán
         </h1>
-        <div style={{ width: "50%" }}>
+        <div
+          style={{
+            width: "50%",
+            backgroundColor: "#fff",
+            padding: "24px",
+            borderRadius: "8px",
+            boxShadow: "0 0 5px 5px rgba(0,0,0,0.05)",
+          }}
+        >
           <Form>
             <Form.Item>
               <div style={{ display: "flex", justifyContent: "space-between" }}>

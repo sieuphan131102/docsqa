@@ -17,7 +17,7 @@ const ListDocs = ({ data }) => {
 
   return (
     <List
-      pagination={{ pageSize: 4, style: { padding: "12px" } }}
+      pagination={{ pageSize: 8, style: { padding: "12px" } }}
       grid={{ gutter: 16, column: 4 }}
       dataSource={data}
       renderItem={(doc, index) => (
