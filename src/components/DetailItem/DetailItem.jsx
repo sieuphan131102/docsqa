@@ -107,7 +107,7 @@ const DetailItem = ({ data }) => {
         }
       );
       setSuccess(true);
-      navigate(`/view/${data._id}`);
+      navigate(`/view/${data?._id}`);
       handleUpdateCountView();
     } catch (error) {
       console.log(error);
@@ -115,7 +115,7 @@ const DetailItem = ({ data }) => {
   };
 
   const handleDownload = async () => {
-    if (data?.price === 0 || isPaymented(data._id)) {
+    if (data?.price === 0 || isPaymented(data?._id)) {
       const downloadLink = `${process.env.REACT_APP_API_URL}/${data.data}`;
       const link = document.createElement("a");
       link.href = downloadLink;
@@ -125,7 +125,7 @@ const DetailItem = ({ data }) => {
       document.body.removeChild(link);
       handleUpdateCountDownload();
     } else {
-      navigate(`/buy/${data._id}`);
+      navigate(`/buy/${data?._id}`);
     }
   };
 
@@ -215,7 +215,7 @@ const DetailItem = ({ data }) => {
 
   const isPaymented = (docId) => {
     for (let i = 0; i < payment.length; i++) {
-      if (payment[i].bookId._id === docId) {
+      if (payment[i].bookId?._id === docId) {
         return true;
       }
     }
@@ -306,7 +306,7 @@ const DetailItem = ({ data }) => {
               </Button>
               <Button onClick={handleDownload} type="primary">
                 Tải sách (
-                {isPaymented(data._id) ? "Đã mua" : data?.price + " VNĐ"})
+                {isPaymented(data?._id) ? "Đã mua" : data?.price + " VNĐ"})
               </Button>
               <div
                 style={{

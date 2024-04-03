@@ -26,6 +26,7 @@ const AdminDoc = () => {
   const [authorDoc, setAuthorDoc] = useState("");
   const [typeDoc, setTypeDoc] = useState("");
   const [descriptionDoc, setDescriptionDoc] = useState("");
+  const [price, setPrice] = useState("");
 
   const [idDoc, setIdDoc] = useState("");
   const [imageUD, setImageUD] = useState();
@@ -34,8 +35,7 @@ const AdminDoc = () => {
   const [authorDocUD, setAuthorDocUD] = useState("");
   const [typeDocUD, setTypeDocUD] = useState("");
   const [descriptionDocUD, setDescriptionDocUD] = useState("");
-
-  console.log(typeDocUD);
+  const [priceUD, setPriceUD] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -248,7 +248,6 @@ const AdminDoc = () => {
   };
 
   const handleOpenModalUpdate = (this_record) => {
-    console.log(this_record);
     setIdDoc(this_record._id);
     setNameDocUD(this_record.title);
     setAuthorDocUD(this_record.author);
@@ -256,6 +255,7 @@ const AdminDoc = () => {
     setDescriptionDocUD(this_record.description);
     setImageUD(this_record.image);
     setFileUD(this_record.data);
+    setPriceUD(this_record.price);
     setIsModalOpen(true);
   };
 
@@ -272,12 +272,17 @@ const AdminDoc = () => {
 
   const handlePost = async (e) => {
     e.preventDefault();
+    if (type === "") {
+      msg.warning("Chọn thể loại!");
+      return;
+    }
     try {
       const formData = new FormData();
       formData.append("title", nameDoc);
       formData.append("author", authorDoc);
       formData.append("type", typeDoc);
       formData.append("description", descriptionDoc);
+      formData.append("price", price);
       if (image === undefined) {
         msg.warning("Chọn hình ảnh cần thêm!!!");
         return;
@@ -318,6 +323,10 @@ const AdminDoc = () => {
 
   const handleUpdateDoc = async (e) => {
     e.preventDefault();
+    if (typeDocUD === "") {
+      msg.warning("Chọn thể loại!");
+      return;
+    }
     const formData = new FormData();
     formData.append("title", nameDocUD);
     formData.append("author", authorDocUD);
@@ -325,6 +334,7 @@ const AdminDoc = () => {
     formData.append("description", descriptionDocUD);
     formData.append("image", imageUD);
     formData.append("data", fileUD);
+    formData.append("price", priceUD);
     try {
       await axios
         .put(
@@ -391,7 +401,7 @@ const AdminDoc = () => {
         </Button>
       </div>
       <Table
-        pagination={{ pageSize: 4 }}
+        pagination={{ pageSize: 8 }}
         key={tableKey}
         loading={isLoading}
         columns={columns}
@@ -439,6 +449,7 @@ const AdminDoc = () => {
                 name="type"
                 id="type"
               >
+                <option value="">Chọn thể loại</option>
                 {type.map((item) => (
                   <option key={item._id} value={item._id}>
                     {item.name}
@@ -452,6 +463,14 @@ const AdminDoc = () => {
                 value={descriptionDoc}
                 onChange={(e) => setDescriptionDoc(e.target.value)}
                 type="text"
+              />
+            </div>
+            <div>
+              <h3>Giá</h3>
+              <input
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                type="number"
               />
             </div>
           </div>
@@ -526,6 +545,7 @@ const AdminDoc = () => {
                 name="type"
                 id="type"
               >
+                <option value="">Chọn thể loại</option>
                 {type.map((item) => (
                   <option key={item._id} value={item._id}>
                     {item.name}
@@ -539,6 +559,14 @@ const AdminDoc = () => {
                 value={descriptionDocUD}
                 onChange={(e) => setDescriptionDocUD(e.target.value)}
                 type="text"
+              />
+            </div>
+            <div>
+              <h3>Giá</h3>
+              <input
+                value={priceUD}
+                onChange={(e) => setPriceUD(e.target.value)}
+                type="number"
               />
             </div>
           </div>

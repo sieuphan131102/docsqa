@@ -146,7 +146,7 @@ const ViewPdf = () => {
 
   const isPaymented = (docId) => {
     for (let i = 0; i < payment.length; i++) {
-      if (payment[i].bookId._id === docId) {
+      if (payment[i].bookId?._id === docId) {
         return true;
       }
     }

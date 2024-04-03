@@ -77,7 +77,7 @@ const Buy = () => {
           return;
         }
         for (let i = 0; i < payment.length; i++) {
-          if (payment[i].bookId._id === id) {
+          if (payment[i].bookId?._id === id) {
             return;
           }
         }
@@ -122,7 +122,7 @@ const Buy = () => {
           <strong>Tác giả:</strong> {doc.author}
         </div>
         <div>
-          <strong>Thể loại:</strong> {doc.type}
+          <strong>Thể loại:</strong> {doc.type?.name}
         </div>
         <div>
           <strong>Giá:</strong> {doc.price} <DollarTwoTone />
