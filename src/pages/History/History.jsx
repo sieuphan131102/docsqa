@@ -35,7 +35,16 @@ const History = () => {
 
   useEffect(() => {
     const filterNull = history.filter((item) => item.bookId !== null);
-    const historyRender = filterNull.map((item) => item.bookId);
+    const seen = new Map();
+    const filterData = filterNull.filter((item) => {
+      const { _id } = item.bookId;
+      if (seen.has(_id)) {
+        return false;
+      }
+      seen.set(_id, true);
+      return true;
+    });
+    const historyRender = filterData.map((item) => item.bookId);
     setRender(historyRender);
   }, [history]);
 
