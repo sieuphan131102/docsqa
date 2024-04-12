@@ -46,7 +46,7 @@ const Bank = () => {
     <div>
       <Form>
         <Form.Item>
-          <label htmlFor="coin-number">Số tiền</label>
+          <label htmlFor="coin-number">Số tiền (1 VND = 1 xu)</label>
           <br />
           <InputNumber
             style={{ width: "100%" }}
