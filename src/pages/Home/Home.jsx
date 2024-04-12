@@ -9,11 +9,13 @@ import { Helmet } from "react-helmet";
 
 const Home = () => {
   const [docs, setDocs] = useState([]);
+  const [docsView, setDocsView] = useState([]);
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     getAllDocs();
+    getAllDocsView();
   }, []);
 
   const getAllDocs = async () => {
@@ -29,6 +31,21 @@ const Home = () => {
     }
   };
 
+  console.log(docsView);
+
+  const getAllDocsView = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/document/all?sortBy=view`
+      );
+      setDocsView(res?.data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ backgroundColor: "#eeefff" }}>
       <Helmet>
@@ -37,7 +54,8 @@ const Home = () => {
       <Container>
         <NavbarLeft />
         <Spin spinning={isLoading}>
-          <DocsGroup title={"Sách nổi bật"} data={docs} />
+          <DocsGroup title={"Sách nổi bật"} data={docsView} />
+          <DocsGroup title={"Sách hay"} data={docs} />
         </Spin>
       </Container>
     </div>
